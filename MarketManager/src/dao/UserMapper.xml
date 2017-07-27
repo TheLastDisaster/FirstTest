@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.UserMapper">
+	<select id="getUserById" parameterType="int" resultMap="userMap">
+		select u.*,r.id as rid,r.roleCode,r.roleName,r.createdBy as rcreatedBy,r.modifyBy as rmodifyBy,r.creationDate as rcreationDate,r.modifyDate as rmodifyDate from smbms_user u,smbms_role r 
+		where u.id=#{id} and u.userRole = r.id
+	</select>
+	<resultMap type="su" id="userMap" autoMapping="true">
+		<association property="userRole" javaType="sr" autoMapping="true">
+			<id property="id" column="rid"/>
+			<result property="createdBy" column="rcreatedBy"/>
+			<result property="modifyBy" column="rmodifyBy"/>
+			<result property="creationDate" column="rcreationDate"/>
+			<result property="modifyDate" column="rmodifyDate"/>
+		</association>
+	</resultMap>
+	<select id="getAllUsers"  resultMap="userMap">
+		select u.*,r.id as rid,r.roleCode,r.roleName,r.createdBy as rcreatedBy,r.modifyBy as rmodifyBy,r.creationDate as rcreationDate,r.modifyDate as rmodifyDate from smbms_user u,smbms_role r 
+		where u.userRole = r.id ORDER BY u.userRole LIMIT #{startUp},#{size}
+	</select>
+	<select id="getSize"  resultType="int">
+		select count(*) from smbms_user 
+	</select>
+	<select id="getSizeByName"  resultType="int">
+		select count(*) from smbms_user where userName LIKE CONCAT('%',#{name},'%')
+	</select>
+	<select id="queryUsers"  resultMap="userMap">
+		SELECT u.*,r.id AS rid,r.roleCode,r.roleName,r.createdBy AS rcreatedBy,r.modifyBy AS rmodifyBy,r.creationDate AS rcreationDate,r.modifyDate AS rmodifyDate FROM smbms_user u,smbms_role r 
+		WHERE u.userName LIKE CONCAT('%',#{name},'%') AND u.userRole = r.id ORDER BY u.userRole LIMIT #{startUp},#{size}
+	</select>
+	<update id="updateUser" parameterType="su">
+		update smbms_user 
+		<trim prefix="set" suffixOverrides="," suffix="where id=#{id}">
+			<if test="userCode != null">
+				userCode=#{userCode},
+			</if>
+			<if test="userName != null">
+				userName=#{userName},
+			</if>
+			<if test="userPassword != null">
+				userPassword=#{userPassword},
+			</if>
+			<if test="gender != null">
+				gender=#{gender},
+			</if>
+			<if test="birthday != null">
+				birthday=#{birthday},
+			</if>
+			<if test="phone != null">
+				phone=#{phone},
+			</if>
+			<if test="address != null">
+				address=#{address},
+			</if>
+			<if test="userRole != null and userRole.id != null">
+				userRole=#{userRole.id},
+			</if>
+			<if test="createdBy != null and createdBy != 0">
+				createdBy=#{createdBy},
+			</if>
+			<if test="creationDate != null">
+				creationDate=#{creationDate},
+			</if>
+			<if test="modifyBy != null and modifyBy != 0">
+				modifyBy=#{modifyBy},
+			</if>
+			<if test="modifyDate != null">
+				modifyDate=#{modifyDate},
+			</if>
+		</trim>
+	</update>
+	<insert id="addUser" parameterType="su">
+		insert into smbms_user values(null,#{userCode},#{userName},#{userPassword},#{gender},
+		#{birthday},#{phone},#{address},#{userRole.id},#{createdBy},#{creationDate},#{modifyBy},#{modifyDate})
+	</insert>
+	<delete id="delUserById" parameterType="int">
+		delete from smbms_user where id=#{id}
+	</delete>
+</mapper>

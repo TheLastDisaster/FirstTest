@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.BillMapper">
+	<select id="getBillsByMsg" resultMap="bills">
+		select b.*,p.proName from smbms_bill b,smbms_provider p 
+		<where>
+				b.providerId=p.id
+			<if test="productName!=null">
+				and productName like concat('%',#{productName},'%')
+			</if>
+			<if test="proName!=null">
+				and proName like concat('%',#{proName},'%')
+			</if>
+			<if test="isPayment!=null">
+				and isPayment =#{isPayment}
+			</if>
+		</where>
+		limit #{startUp},#{size}
+	</select>
+	<select id="getSize"  resultType="int">
+		select count(*) from smbms_bill b,smbms_provider p 
+		<where>
+				b.providerId=p.id
+			<if test="productName!=null">
+				and productName like concat('%',#{productName},'%')
+			</if>
+			<if test="proName!=null">
+				and proName like concat('%',#{proName},'%')
+			</if>
+			<if test="isPayment!=null">
+				and isPayment =#{isPayment}
+			</if>
+		</where>
+	</select>
+	<select id="getBillById" parameterType="int" resultMap="bills">
+		select b.*,p.proName from smbms_bill b,smbms_provider p where b.id=#{id} and b.providerId=p.id
+	</select>
+	<insert id="addBill" parameterType="entity.Smbms_bill">
+		insert into smbms_bill value(null,#{billCode},#{productName},#{productDesc},#{productUnit},#{productCount},#{totalPrice},
+		#{isPayment},#{createdBy},#{creationDate},#{modifyBy},#{modifyDate},#{providerId})
+	</insert>
+	<select id="getAllBills" resultMap="bills">
+		select b.*,p.proName from smbms_bill b,smbms_provider p where b.providerId=p.id limit #{startUp},#{size}
+	</select>
+	<resultMap type="sb" id="bills" autoMapping="true">
+		<association property="provider" javaType="sp" autoMapping="true">
+		</association>
+	</resultMap>
+	
+	<update id="updateBill" parameterType="sb">
+		update smbms_bill
+		<trim prefix="set" suffixOverrides="," suffix="where id=#{id}">
+			<if test="billCode != null">
+				billCode=#{billCode},
+			</if>
+			<if test="productName != null">
+				productName=#{productName},
+			</if>
+			<if test="productDesc != null">
+				productDesc=#{productDesc},
+			</if>
+			<if test="productUnit != null">
+				productUnit=#{productUnit},
+			</if>
+			<if test="productCount != null">
+				productCount=#{productCount},
+			</if>
+			<if test="totalPrice != null">
+				totalPrice=#{totalPrice},
+			</if>
+			<if test="isPayment != null">
+				isPayment=#{isPayment},
+			</if>
+			<if test="createdBy != null">
+				createdBy=#{createdBy},
+			</if>
+			<if test="creationDate != null">
+				creationDate=#{creationDate},
+			</if>
+			<if test="modifyBy != null">
+				modifyBy=#{modifyBy},
+			</if>
+			<if test="modifyDate != null">
+				modifyDate=#{modifyDate},
+			</if>
+		</trim>
+	</update>
+	 
+	<delete id="delBillById"  parameterType="int"> 
+		delete from smbms_bill where id=#{id}
+	</delete>
+</mapper>
